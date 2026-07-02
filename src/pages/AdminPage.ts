@@ -15,6 +15,52 @@ export class AdminPage {
     this.modalContainer = page.locator('div.oxd-modal-container');
   }
 
+  async getUserRowCount() {
+    await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 15000 }).catch(() => {});
+    return await this.userTableCards.count();
+  }
+
+  async addTestUser(username?: string) {
+    const addBtn = this.page.locator('button:has-text("Add")').first();
+    await expect(addBtn).toBeVisible({ timeout: 10000 });
+    await addBtn.click();
+
+    // Wait for the add-user form to appear
+    const form = this.page.locator('div.oxd-form');
+    await expect(form).toBeVisible({ timeout: 10000 });
+
+    const uname = username ?? `testuser_${Date.now().toString().slice(-5)}`;
+
+    const usernameInput = this.page.locator('label:has-text("Username")').locator('..').locator('input');
+    const employeeInput = this.page.locator('label:has-text("Employee Name")').locator('..').locator('input');
+    const passwordInput = this.page.locator('label:has-text("Password")').locator('..').locator('input[type="password"]');
+    const confirmPasswordInput = this.page.locator('label:has-text("Confirm Password")').locator('..').locator('input[type="password"]');
+
+    // Fill the form. Employee name uses autocomplete; choose the first match.
+    await usernameInput.fill(uname);
+    await employeeInput.fill('Admin');
+    await this.page.keyboard.press('ArrowDown');
+    await this.page.keyboard.press('Enter');
+
+    const pwd = 'Password@123';
+    await passwordInput.fill(pwd);
+    await confirmPasswordInput.fill(pwd);
+
+    const saveBtn = this.page.locator('button:has-text("Save")').first();
+    await expect(saveBtn).toBeVisible({ timeout: 5000 });
+    await saveBtn.click();
+
+    // Wait until the new username appears in the table
+    try {
+      await this.page.waitForFunction((name) => !!document.querySelector(`div.oxd-table-body >> text=${name}`), uname, { timeout: 15000 });
+    } catch (e) {
+      // final fallback: wait a short while for UI update
+      await this.page.waitForTimeout(2000);
+    }
+
+    return uname;
+  }
+
   async navigateToAdmin() {
     await expect(this.systemUsersMenu).toBeVisible({ timeout: 10000 });
     // Click without waiting for navigation so we can wait for the actual UI element that indicates the Admin view
