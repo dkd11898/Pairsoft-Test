@@ -1,55 +1,148 @@
-# OrangeHRM Playwright TypeScript Assignment
+# OrangeHRM Automation Assignment
+**Playwright + TypeScript | Page Object Model (POM)**
 
-Overview
-This repository contains an end-to-end Playwright test suite (TypeScript) for the OrangeHRM demo site. Tests follow the Page Object Model to keep selectors and flows maintainable.
+## Overview
 
-Key files
-- `src/pages/LoginPage.ts` — login page object
-- `src/pages/AdminPage.ts` — admin page object (delete flow)
-- `tests/orangehrm.spec.ts` — primary test that logs in and performs a delete action
-- `playwright.config.ts` — Playwright configuration
+This project contains an end-to-end UI automation solution for the OrangeHRM demo application using **Playwright with TypeScript**.
 
-Quick setup
-1. Install dependencies
+The solution follows industry best practices including:
+
+- Page Object Model (POM)
+- Reusable page classes
+- Dynamic credential extraction (No hardcoded credentials)
+- Clean and maintainable code
+- Assertions using Playwright Test
+- Automatic screenshots and traces on failure
+- HTML Reporting
+
+---
+
+## Assignment Covered
+
+✔ Open OrangeHRM Login Page
+
+✔ Read Username & Password dynamically from the login information panel
+
+✔ Login without hardcoded credentials
+
+✔ Navigate to **Admin**
+
+✔ Delete the second user record
+
+✔ Confirm deletion
+
+✔ Verify the deleted username no longer exists
+
+---
+
+## Tech Stack
+
+- Playwright
+- TypeScript
+- Node.js
+- Playwright Test Runner
+
+---
+
+## Project Structure
+
+```
+.
+├── src
+│   ├── pages
+│   │   ├── LoginPage.ts
+│   │   ├── DashboardPage.ts
+│   │   └── AdminPage.ts
+│   │
+│   ├── utils
+│   └── fixtures
+│
+├── tests
+│   └── orangehrm.spec.ts
+│
+├── playwright.config.ts
+├── package.json
+└── README.md
+```
+
+---
+
+## Prerequisites
+
+- Node.js 18+
+- npm
+
+---
+
+## Installation
+
 ```bash
 npm install
 ```
 
-2. Install Playwright browsers (run once)
+Install Playwright browsers:
+
 ```bash
-npx playwright install --with-deps
+npx playwright install
 ```
 
-Run tests
-- Run the full suite:
+---
+
+## Execute Tests
+
+Run all tests
+
 ```bash
 npx playwright test
 ```
-- Run a single spec (headed for debugging):
+
+Run in headed mode
+
 ```bash
-npx playwright test tests/orangehrm.spec.ts --headed
+npx playwright test --headed
 ```
 
-Notes for reviewers
-- The tests run against the public demo site: https://opensource-demo.orangehrmlive.com
-- If a test fails or times out, open the trace for a visual replay:
+Run a single test
+
 ```bash
-npx playwright show-trace test-results/<test-folder>/trace.zip
-```
-- To inspect or refine selectors, run the spec headed or use the Playwright recorder:
-```bash
-npx playwright codegen https://opensource-demo.orangehrmlive.com
+npx playwright test tests/orangehrm.spec.ts
 ```
 
-Repository housekeeping
-- A `.gitignore` is included to keep generated artifacts out of the repo (e.g., `node_modules`, `test-results`).
-- Debug/inspect scripts were removed to keep the project focused and shareable.
+---
 
-Share / push
+## Reports
+
+Open HTML Report
+
 ```bash
-git remote add origin <remote-url>
-git branch -M main
-git push -u origin main
+npx playwright show-report
 ```
 
-If you'd like, I can produce a short GIF or video that demonstrates a test run for inclusion in the README or a follow-up email to a recruiter.
+View execution trace
+
+```bash
+npx playwright show-trace test-results/<folder>/trace.zip
+```
+
+---
+
+## Notes
+
+- Credentials are extracted dynamically from the login page.
+- No username or password is hardcoded.
+- The framework follows the Page Object Model for better scalability and maintainability.
+- The test validates successful deletion by ensuring the deleted username is no longer present in the table.
+
+---
+
+## Target Application
+
+https://opensource-demo.orangehrmlive.com
+
+---
+
+## Author
+
+**Dipendra Dabhi**
+
+Senior SDET | QA Automation Engineer
