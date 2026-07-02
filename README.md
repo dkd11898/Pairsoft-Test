@@ -69,10 +69,10 @@ The solution follows industry best practices including:
 ## Demo
 
 <p align="center">
-	<video src="docs/demo.webm" controls width="640">Your browser does not support the video tag.</video>
+  <img src="docs/demo.gif" alt="OrangeHRM Playwright demo" width="640" />
 </p>
 
-If your browser doesn't render the video, open the file directly: [docs/demo.webm](docs/demo.webm)
+If your browser doesn't render the image, open the full recording here: [docs/demo.webm](docs/demo.webm)
 
 ---
 
