@@ -1,62 +1,55 @@
 # OrangeHRM Playwright TypeScript Assignment
 
-This repository contains an end-to-end Playwright TypeScript test implementing the OrangeHRM assignment using the Page Object Model (POM).
+Overview
+This repository contains an end-to-end Playwright test suite (TypeScript) for the OrangeHRM demo site. Tests follow the Page Object Model to keep selectors and flows maintainable.
 
-Summary
-- Tests: Playwright + TypeScript
-- Pattern: Page Object Model (`src/pages/LoginPage.ts`, `src/pages/AdminPage.ts`)
-- Primary spec: `tests/orangehrm.spec.ts`
+Key files
+- `src/pages/LoginPage.ts` — login page object
+- `src/pages/AdminPage.ts` — admin page object (delete flow)
+- `tests/orangehrm.spec.ts` — primary test that logs in and performs a delete action
+- `playwright.config.ts` — Playwright configuration
 
-Prerequisites
-- Node.js 18+ and npm
-- Git (for pushing/sharing)
-
-Install dependencies
+Quick setup
+1. Install dependencies
 ```bash
 npm install
-# Install Playwright browsers (run once)
+```
+
+2. Install Playwright browsers (run once)
+```bash
 npx playwright install --with-deps
 ```
 
-Run the full test suite
+Run tests
+- Run the full suite:
 ```bash
 npx playwright test
 ```
-
-Run a single spec (headed for debugging)
+- Run a single spec (headed for debugging):
 ```bash
 npx playwright test tests/orangehrm.spec.ts --headed
 ```
 
-Test notes & troubleshooting
-- Tests expect the demo OrangeHRM site to be reachable: https://opensource-demo.orangehrmlive.com
-- If a test times out, open the failing trace with:
-	```bash
-	npx playwright show-trace test-results/<test-folder>/trace.zip
-	```
-- Common fixes: run the spec headed to inspect selectors, or re-run `npx playwright codegen` to confirm selectors.
+Notes for reviewers
+- The tests run against the public demo site: https://opensource-demo.orangehrmlive.com
+- If a test fails or times out, open the trace for a visual replay:
+```bash
+npx playwright show-trace test-results/<test-folder>/trace.zip
+```
+- To inspect or refine selectors, run the spec headed or use the Playwright recorder:
+```bash
+npx playwright codegen https://opensource-demo.orangehrmlive.com
+```
 
-Repository hygiene
-- I removed local debug/inspect scripts and screenshots to keep the repo clean.
-- `.gitignore` added to exclude `node_modules`, `test-results`, and temporary artifacts.
+Repository housekeeping
+- A `.gitignore` is included to keep generated artifacts out of the repo (e.g., `node_modules`, `test-results`).
+- Debug/inspect scripts were removed to keep the project focused and shareable.
 
-Project structure
-- `src/pages/` — Page Object Model classes (`LoginPage.ts`, `AdminPage.ts`)
-- `tests/` — Playwright test specs
-- `playwright.config.ts` — Playwright settings
-
-Share with recruiter (push)
-1. Add remote (replace `<remote-url>`):
+Share / push
 ```bash
 git remote add origin <remote-url>
-```
-2. Set branch and push:
-```bash
 git branch -M main
 git push -u origin main
 ```
 
-If you want, I can also prepare a short `SUMMARY.md` or a demo GIF showing tests running.
-
-Contact / Notes for reviewer
-- The test demonstrates POM, clean selectors, and a simple delete flow on the Admin page. See the `src/pages` folder for implementation details.
+If you'd like, I can produce a short GIF or video that demonstrates a test run for inclusion in the README or a follow-up email to a recruiter.
