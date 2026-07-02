@@ -18,12 +18,7 @@ test('login and delete second admin user on OrangeHRM', async ({ page }, testInf
 
   await test.step('Delete second user', async () => {
     const rowCount = await adminPage.getUserRowCount();
-    if (rowCount < 2) {
-      // create a test user so the delete flow can run reliably
-      await adminPage.addTestUser();
-      // ensure the table is refreshed
-      await adminPage.navigateToAdmin();
-    }
+    expect(rowCount).toBeGreaterThanOrEqual(2);
     const deletedUsername = await adminPage.deleteSecondUser();
     await adminPage.confirmDelete();
     await adminPage.assertUserDeleted(deletedUsername);

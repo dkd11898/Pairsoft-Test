@@ -16,71 +16,27 @@ export class AdminPage {
   }
 
   async getUserRowCount() {
-    await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 15000 }).catch(() => {});
+    await expect(this.userTableCards.first()).toBeVisible({ timeout: 15000 });
     return await this.userTableCards.count();
-  }
-
-  async addTestUser(username?: string) {
-    const addBtn = this.page.locator('button:has-text("Add")').first();
-    await expect(addBtn).toBeVisible({ timeout: 10000 });
-    await addBtn.click();
-
-    // Wait for the add-user form to appear
-    const form = this.page.locator('div.oxd-form');
-    await expect(form).toBeVisible({ timeout: 10000 });
-
-    const uname = username ?? `testuser_${Date.now().toString().slice(-5)}`;
-
-    const usernameInput = this.page.locator('label:has-text("Username")').locator('..').locator('input');
-    const employeeInput = this.page.locator('label:has-text("Employee Name")').locator('..').locator('input');
-    const passwordInput = this.page.locator('label:has-text("Password")').locator('..').locator('input[type="password"]');
-    const confirmPasswordInput = this.page.locator('label:has-text("Confirm Password")').locator('..').locator('input[type="password"]');
-
-    // Fill the form. Employee name uses autocomplete; choose the first match.
-    await usernameInput.fill(uname);
-    await employeeInput.fill('Admin');
-    await this.page.keyboard.press('ArrowDown');
-    await this.page.keyboard.press('Enter');
-
-    const pwd = 'Password@123';
-    await passwordInput.fill(pwd);
-    await confirmPasswordInput.fill(pwd);
-
-    const saveBtn = this.page.locator('button:has-text("Save")').first();
-    await expect(saveBtn).toBeVisible({ timeout: 5000 });
-    await saveBtn.click();
-
-    // Wait until the new username appears in the table
-    try {
-      await this.page.waitForFunction((name) => !!document.querySelector(`div.oxd-table-body >> text=${name}`), uname, { timeout: 15000 });
-    } catch (e) {
-      // final fallback: wait a short while for UI update
-      await this.page.waitForTimeout(2000);
-    }
-
-    return uname;
   }
 
   async navigateToAdmin() {
     await expect(this.systemUsersMenu).toBeVisible({ timeout: 10000 });
-    // Click without waiting for navigation so we can wait for the actual UI element that indicates the Admin view
     await this.systemUsersMenu.click({ noWaitAfter: true });
-    // Wait for the system users table DOM to appear (cards may render later)
+
     try {
-      await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 15000 });
+      await expect(this.userTableCards.first()).toBeVisible({ timeout: 15000 });
     } catch (e) {
-      // Fallback: the page may require clicking the Search button to populate results
       const searchBtn = this.page.locator('button:has-text("Search")').first();
       if (await searchBtn.count() > 0) {
         await searchBtn.click({ force: true });
       }
-      await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 15000 });
+      await expect(this.userTableCards.first()).toBeVisible({ timeout: 15000 });
     }
   }
 
   async deleteSecondUser() {
-    // Ensure the table has rendered before counting rows. Wait for any card to appear.
-    await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 30000 });
+    await expect(this.userTableCards.first()).toBeVisible({ timeout: 30000 });
     const rowCount = await this.userTableCards.count();
     if (rowCount < 2) {
       throw new Error(`Expected at least 2 user rows before deleting, but found ${rowCount}.`);

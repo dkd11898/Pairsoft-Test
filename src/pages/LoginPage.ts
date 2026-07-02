@@ -41,8 +41,7 @@ export class LoginPage {
 
       return { username, password };
     } catch (e) {
-      // Fallback to known demo credentials for the OrangeHRM public demo
-      return { username: 'Admin', password: 'admin123' };
+      throw new Error('Unable to fetch credentials from login label');
     }
   }
 
