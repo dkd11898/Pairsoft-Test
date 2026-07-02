@@ -68,11 +68,7 @@ The solution follows industry best practices including:
 
 ## Demo
 
-<p align="center">
-  <img src="docs/demo.gif" alt="OrangeHRM Playwright demo" width="640" />
-</p>
-
-If your browser doesn't render the image, open the full recording here: [docs/demo.webm](docs/demo.webm)
+> The demo recording is available from the live test artifacts and should not be included in the ZIP submission. Run the test locally with `npx playwright test` to reproduce the flow.
 
 ---
 
