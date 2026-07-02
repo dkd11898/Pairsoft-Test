@@ -66,6 +66,14 @@ The solution follows industry best practices including:
 └── README.md
 ```
 
+## Demo
+
+<p align="center">
+	<video src="docs/demo.webm" controls width="640">Your browser does not support the video tag.</video>
+</p>
+
+If your browser doesn't render the video, open the file directly: [docs/demo.webm](docs/demo.webm)
+
 ---
 
 ## Prerequisites

@@ -22,3 +22,22 @@ jobs:
         run: npx playwright test --reporter=list
         env:
           CI: true
+      - name: Install ffmpeg
+        if: always()
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Convert videos to GIFs
+        if: always()
+        run: |
+          shopt -s globstar || true
+          for f in test-artifacts/**/video.webm; do
+            if [ -f "$f" ]; then
+              out="${f%.*}.gif"
+              ffmpeg -y -i "$f" -vf "fps=10,scale=640:-1:flags=lanczos" "$out" || true
+            fi
+          done
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: test-artifacts/**
