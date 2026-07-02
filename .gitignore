@@ -13,3 +13,4 @@ inspect*.js
 .env
 npm-debug.log*
 package-lock.json
+test-artifacts/
