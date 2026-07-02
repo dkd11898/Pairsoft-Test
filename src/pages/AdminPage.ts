@@ -17,13 +17,24 @@ export class AdminPage {
 
   async navigateToAdmin() {
     await expect(this.systemUsersMenu).toBeVisible({ timeout: 10000 });
-    await Promise.all([
-      this.page.waitForURL('**/admin/viewSystemUsers'),
-      this.systemUsersMenu.click()
-    ]);
+    // Click without waiting for navigation so we can wait for the actual UI element that indicates the Admin view
+    await this.systemUsersMenu.click({ noWaitAfter: true });
+    // Wait for the system users table DOM to appear (cards may render later)
+    try {
+      await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 15000 });
+    } catch (e) {
+      // Fallback: the page may require clicking the Search button to populate results
+      const searchBtn = this.page.locator('button:has-text("Search")').first();
+      if (await searchBtn.count() > 0) {
+        await searchBtn.click({ force: true });
+      }
+      await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 15000 });
+    }
   }
 
   async deleteSecondUser() {
+    // Ensure the table has rendered before counting rows. Wait for any card to appear.
+    await this.page.waitForFunction(() => !!document.querySelector('div.oxd-table-body > div.oxd-table-card'), null, { timeout: 30000 });
     const rowCount = await this.userTableCards.count();
     if (rowCount < 2) {
       throw new Error(`Expected at least 2 user rows before deleting, but found ${rowCount}.`);
@@ -34,71 +45,27 @@ export class AdminPage {
     if (!username) {
       throw new Error('Unable to read the username from the second row.');
     }
-    await secondRow.locator('button:has(i[class*="bi-trash"])').click();
+    await secondRow.locator('button:has(.bi-trash)').click();
     return username;
   }
 
   async confirmDelete() {
-    // Try several strategies to locate the actual confirmation control used by the app.
-    // Some OrangeHRM builds render a visible overlay/dialog, others render inline buttons.
-    // 1) Prefer an overlay/dialog if it's visible
-    const visibleOverlay = this.page.locator('div.oxd-overlay:not(.oxd-overlay--hide)');
-    if (await visibleOverlay.count() > 0) {
-      // Look for common confirmation button texts inside the overlay
-      const yesBtnInOverlay = visibleOverlay.locator('button:has-text("Yes")');
-      const deleteBtnInOverlay = visibleOverlay.locator('button:has-text("Delete")');
-      const confirmBtnInOverlay = visibleOverlay.locator('button:has-text("Confirm")');
-      if (await yesBtnInOverlay.count() > 0) {
-        await yesBtnInOverlay.first().click();
-      } else if (await deleteBtnInOverlay.count() > 0) {
-        await deleteBtnInOverlay.first().click();
-      } else if (await confirmBtnInOverlay.count() > 0) {
-        await confirmBtnInOverlay.first().click();
-      } else {
-        // fallback to any visible danger-style button in the overlay
-        const danger = visibleOverlay.locator('button.oxd-button--label-danger');
-        if (await danger.count() > 0) await danger.first().click();
-      }
-      await expect(visibleOverlay).toBeHidden({ timeout: 10000 });
+    // Wait for the confirmation modal or button, then click the 'Yes, Delete' action.
+    const confirmBtn = this.page.getByRole('button', { name: /Yes, Delete/i });
+    try {
+      await expect(confirmBtn).toBeVisible({ timeout: 15000 });
+      await confirmBtn.click();
       return;
+    } catch (e) {
+      // Fallback: wait for any button with the confirmation text and click it
+      await this.page.waitForSelector('button:has-text("Yes, Delete")', { timeout: 15000 });
+      await this.page.click('button:has-text("Yes, Delete")');
     }
-
-    // 2) If no overlay visible, try to find inline confirmation buttons anywhere on page
-    const inlineYes = this.page.locator('button:has-text("Yes")');
-    const inlineDelete = this.page.locator('button:has-text("Delete")');
-    const inlineConfirm = this.page.locator('button:has-text("Confirm")');
-    if (await inlineYes.count() > 0) {
-      await inlineYes.first().click();
-      return;
-    }
-    if (await inlineDelete.count() > 0) {
-      await inlineDelete.first().click();
-      return;
-    }
-    if (await inlineConfirm.count() > 0) {
-      await inlineConfirm.first().click();
-      return;
-    }
-
-    // 3) Last resort: click any visible danger-styled button
-    const anyDanger = this.page.locator('button.oxd-button--label-danger');
-    if (await anyDanger.count() > 0) {
-      await anyDanger.first().click();
-      return;
-    }
-
-    throw new Error('Unable to find a confirmation button to complete delete action.');
   }
 
   async assertUserDeleted(username: string) {
-    await this.page.waitForTimeout(2000);
-    const rows = this.userTableCards;
-    const rowCount = await rows.count();
-    for (let i = 0; i < rowCount; i++) {
-      const rowUsername = (await rows.nth(i).locator('div.oxd-table-cell').nth(1).textContent())?.trim();
-      if (rowUsername === username) {
-        throw new Error(`Expected username ${username} to be removed from the table, but it still exists.`);
-      }
-    }
+    // Wait until the username no longer appears in the table
+    const usernameLocator = this.page.locator(`div.oxd-table-body >> text=${username}`);
+    await expect(usernameLocator).toHaveCount(0, { timeout: 15000 });
   }
 }
