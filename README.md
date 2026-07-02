@@ -1,3 +1,4 @@
+# [![Playwright Tests](https://github.com/dkd11898/Pairsoft-Test/actions/workflows/playwright.yml/badge.svg)](https://github.com/dkd11898/Pairsoft-Test/actions)
 # OrangeHRM Automation Assignment
 **Playwright + TypeScript | Page Object Model (POM)**
 
