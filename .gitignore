@@ -1,0 +1,15 @@
+node_modules/
+test-results/
+playwright-report/
+.idea/
+.vscode/
+.DS_Store
+dist/
+coverage/
+*.log
+debug*.js
+inspect*.js
+*.png
+.env
+npm-debug.log*
+package-lock.json
